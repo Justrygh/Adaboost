@@ -123,7 +123,47 @@ def split(points: list):
         return points[:int((len(points) + 1) / 2)], points[int((len(points) + 1) / 2):]
 
 
-def calculateError(rules: list, train: list, test: list):
+def predict_value(rules: list, point: Point):
+    """
+    This function predict the label of a point based on rules
+    :param rules: list of important rules.
+    :param point: to predict
+    :return: 1 if predict 1 else -1
+    """
+    sum = 0
+
+    for h in rules:
+        sum += h.w * h.eval(point)
+
+    return 1 if sum > 0 else -1
+
+
+def calculate_point_error(rules: list, point: Point):
+    """
+    This function calculates the empirical error on given point
+    :param rules: list of important rules.
+    :param point: to check for error
+    :return: 1 if there is error else 0
+    """
+    return 1 if predict_value(rules, point) != point.label else 0
+
+
+def calculate_list_error(rules: list, l: list):
+    """
+      This function calculates the empirical error on given list
+      :param rules: list of important rules.
+      :param l: list of data points (training set)
+      :return: total error
+      """
+    error_sum = 0
+
+    for p in l:
+        error_sum += calculate_point_error(rules, p)
+
+    return error_sum / len(l)
+
+
+def calculate_error(rules: list, train: list, test: list):
     """
     This function calculates the empirical error on the training and test sets.
     :param rules: list of important rules.
@@ -131,9 +171,8 @@ def calculateError(rules: list, train: list, test: list):
     :param test: list of data points (testing set)
     :return: lists of empirical errors on the training and testing set over k iterations.
     """
-    train_error, test_error = ([] for _ in range(2))
-    for i in range(len(rules)):
-        pass
+    print("train error: ", calculate_list_error(rules, train))
+    print("test error: ", calculate_list_error(rules, test))
 
 
 def run(points: list, rules: list, iterations: int):
@@ -179,7 +218,7 @@ def run(points: list, rules: list, iterations: int):
 
         important_rules.append(classifier)
 
-    calculateError(rules=important_rules, train=train, test=test)
+    calculate_error(rules=important_rules, train=train, test=test)
 
     # TODO - Return the empirical error of the function H on the training set and on the test set.
 
