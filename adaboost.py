@@ -99,9 +99,13 @@ def createRules(points: list):
         for j in range(i + 1, length):
             p2 = points[j]
             # if p1.x != p2.x:
-            incline = (p1.y - p2.y) / (p1.x - p2.x)
-            bias = p1.y - incline * p1.x
-            rules.append(Rule(point=p1, coefficient=incline, bias=bias, is_axis_parallel=(p1.x == p2.x)))
+            is_axis_parallel = p1.x == p2.x
+
+            if not is_axis_parallel:
+                incline = (p1.y - p2.y) / (p1.x - p2.x)
+                bias = p1.y - incline * p1.x
+
+            rules.append(Rule(point=p1, coefficient=incline, bias=bias, is_axis_parallel=is_axis_parallel))
             # else:
             # if p1.x equals p2.x -> incline = coefficient = infinity & bias = 0
             # rules.append(Rule(point=p1, coefficient=np.inf))
