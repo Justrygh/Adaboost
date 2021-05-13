@@ -13,7 +13,7 @@ class Point:
         """
         self.x = x
         self.y = y
-        self.label = label.astype(np.int)
+        self.label = label.astype(int)
         self.w = 0
         self.placeholder = None
 
@@ -33,7 +33,7 @@ class Point:
 
 class Rule:
 
-    def __init__(self, point: Point, coefficient,is_zero, bias=0):
+    def __init__(self, point: Point, coefficient, is_axis_parallel, bias=0):
         """
         - Rule: y=ax+b
         :param point: Single point for computing line equation.
@@ -44,7 +44,7 @@ class Rule:
         self.a = coefficient
         self.b = bias
         self.w = 0
-        self.is_zero = is_zero
+        self.is_axis_parallel = is_axis_parallel
 
     def __eq__(self, other):
         return self.a == other.a and self.b == other.b
@@ -60,7 +60,7 @@ class Rule:
         :return: eval
         """
 
-        if self.is_zero:
+        if self.is_axis_parallel:
             return 1 if point.x - self.point.x > 0 else -1
 
         if self.a * point.x + self.b - point.y > 0:
@@ -101,7 +101,7 @@ def createRules(points: list):
             # if p1.x != p2.x:
             incline = (p1.y - p2.y) / (p1.x - p2.x)
             bias = p1.y - incline * p1.x
-            rules.append(Rule(point=p1, coefficient=incline, bias=bias))
+            rules.append(Rule(point=p1, coefficient=incline, bias=bias, is_axis_parallel=(p1.x == p2.x)))
             # else:
             # if p1.x equals p2.x -> incline = coefficient = infinity & bias = 0
             # rules.append(Rule(point=p1, coefficient=np.inf))
