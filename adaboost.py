@@ -33,7 +33,7 @@ class Point:
 
 class Rule:
 
-    def __init__(self, point: Point, coefficient, bias=0):
+    def __init__(self, point: Point, coefficient,is_zero, bias=0):
         """
         - Rule: y=ax+b
         :param point: Single point for computing line equation.
@@ -44,6 +44,7 @@ class Rule:
         self.a = coefficient
         self.b = bias
         self.w = 0
+        self.is_zero = is_zero
 
     def __eq__(self, other):
         return self.a == other.a and self.b == other.b
@@ -58,7 +59,11 @@ class Rule:
         - if eval > 0 return 1 otherwise -1
         :return: eval
         """
-        if self.a * self.p.x + self.b - self.p.y > 0:
+
+        if self.is_zero:
+            return 1 if point.x - self.point.x > 0 else -1
+
+        if self.a * point.x + self.b - point.y > 0:
             return 1
         else:
             return -1
