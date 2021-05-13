@@ -98,7 +98,6 @@ def createRules(points: list):
         p1 = points[i]
         for j in range(i + 1, length):
             p2 = points[j]
-            # if p1.x != p2.x:
             is_axis_parallel = p1.x == p2.x
 
             if not is_axis_parallel:
