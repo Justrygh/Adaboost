@@ -88,16 +88,18 @@ def createRules(points: list):
     :return: list of rules
     """
     rules = []
-    for p1 in points:
-        for p2 in points:
-            if p1 != p2:
-                # if p1.x != p2.x:
-                incline = (p1.y - p2.y) / (p1.x - p2.x)
-                bias = p1.y - incline * p1.x
-                rules.append(Rule(point=p1, coefficient=incline, bias=bias))
-                # else:
-                # if p1.x equals p2.x -> incline = coefficient = infinity & bias = 0
-                # rules.append(Rule(point=p1, coefficient=np.inf))
+    length = len(points)
+    for i in range(0, length):
+        p1 = points[i]
+        for j in range(i + 1, length):
+            p2 = points[j]
+            # if p1.x != p2.x:
+            incline = (p1.y - p2.y) / (p1.x - p2.x)
+            bias = p1.y - incline * p1.x
+            rules.append(Rule(point=p1, coefficient=incline, bias=bias))
+            # else:
+            # if p1.x equals p2.x -> incline = coefficient = infinity & bias = 0
+            # rules.append(Rule(point=p1, coefficient=np.inf))
     return rules
 
 
@@ -108,9 +110,9 @@ def split(points: list):
     :return: train & test groups.
     """
     if len(points) % 2 == 0:
-        return points[:int(len(points)/2)], points[int(len(points)/2):]
+        return points[:int(len(points) / 2)], points[int(len(points) / 2):]
     else:
-        return points[:int((len(points)+1)/2)], points[int((len(points)+1)/2):]
+        return points[:int((len(points) + 1) / 2)], points[int((len(points) + 1) / 2):]
 
 
 def calculateError(rules: list, train: list, test: list):
@@ -134,7 +136,7 @@ def run(points: list, rules: list, iterations: int):
     :return:
     """
     for pt in points:
-        pt.w = 1/len(points)  # Initialize point weights
+        pt.w = 1 / len(points)  # Initialize point weights
     train, test = split(points)
 
     important_rules = []
@@ -154,7 +156,7 @@ def run(points: list, rules: list, iterations: int):
                 min_error = error
                 classifier = h
 
-        classifier.w = math.log((1-min_error)/min_error, math.e) / 2  # Update classifier weight based on error
+        classifier.w = math.log((1 - min_error) / min_error, math.e) / 2  # Update classifier weight based on error
         normalization = 0
 
         for pt in train:
