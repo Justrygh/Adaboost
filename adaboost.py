@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import statistics
 
 
 class Point:
@@ -181,6 +182,8 @@ def calculate_error(rules: list, train: list, test: list, iterations=8):
     for i in range(iterations):
         train_errors.append(calculate_list_error(rules[:i + 1], train))
         test_errors.append(calculate_list_error(rules[:i + 1], test))
+
+    print("train error: ", statistics.mean(train_errors), " test error:", statistics.mean(test_errors))
     return train_errors, test_errors
 
 
@@ -196,6 +199,8 @@ def run(points: list, rules: list, iterations: int):
 
     for h in rules:
         h.w = 0
+
+    np.random.shuffle(points)
 
     train, test = split_data(points)
 
@@ -270,5 +275,7 @@ def represent_data_points(points: list):
 
 points = read_data('rectangle.txt')
 rules = create_rules(points)
-iterations = 8
-run(points, rules, iterations)
+
+for i in range(100):
+    iterations = 8
+    run(points, rules, iterations)
