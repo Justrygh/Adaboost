@@ -287,6 +287,7 @@ for i in range(rounds):
        train_errors[j][i] = train_error[j]
        test_errors[j][i] = test_error[j]
 
+    print(i)
 
 for i in range(iterations):
-    print("k = ", (i + 1)," train error: ", statistics.mean(train_errors[i]), "test error: ", statistics.mean(test_errors[i]))
+    print("k = ", (i + 1)," train error: ", "%.3f" % statistics.mean(train_errors[i]), "test error: ","%.3f" % statistics.mean(test_errors[i]))
