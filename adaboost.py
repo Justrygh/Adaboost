@@ -96,7 +96,7 @@ def create_rules(points: list):
     length = len(points)
     for i in range(length):
         p1 = points[i]
-        for j in range(i+1, length):
+        for j in range(i + 1, length):
             p2 = points[j]
             is_axis_parallel = p1.x == p2.x
 
@@ -177,9 +177,10 @@ def calculate_error(rules: list, train: list, test: list, iterations=8):
     """
     train_errors, test_errors = ([] for _ in range(2))
     iterations = len(rules) if iterations > len(rules) else iterations
+
     for i in range(iterations):
         train_errors.append(calculate_list_error(rules[:i + 1], train))
-        test_errors.append(calculate_list_error(rules[:i+1], test))
+        test_errors.append(calculate_list_error(rules[:i + 1], test))
     return train_errors, test_errors
 
 
@@ -192,6 +193,10 @@ def run(points: list, rules: list, iterations: int):
     """
     for pt in points:
         pt.w = 1 / len(points)  # Initialize point weights
+
+    for h in rules:
+        h.w = 0
+
     train, test = split_data(points)
 
     important_rules = []
