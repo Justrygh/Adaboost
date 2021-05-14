@@ -183,8 +183,7 @@ def calculate_error(rules: list, train: list, test: list, iterations=8):
         train_errors.append(calculate_list_error(rules[:i + 1], train))
         test_errors.append(calculate_list_error(rules[:i + 1], test))
 
-    print("train error: ", statistics.mean(train_errors), " test error:", statistics.mean(test_errors))
-    return train_errors, test_errors
+    return [train_errors, test_errors]
 
 
 def run(points: list, rules: list, iterations: int):
@@ -236,7 +235,7 @@ def run(points: list, rules: list, iterations: int):
 
         important_rules.append(classifier)
 
-    calculate_error(rules=important_rules, train=train, test=test)
+    return calculate_error(rules=important_rules, train=train, test=test)
 
     # TODO - Return the empirical error of the function H on the training set and on the test set.
 
@@ -275,7 +274,19 @@ def represent_data_points(points: list):
 
 points = read_data('rectangle.txt')
 rules = create_rules(points)
+iterations = 8
+rounds = 100
 
-for i in range(100):
-    iterations = 8
-    run(points, rules, iterations)
+train_errors = [[0 for i in range(rounds)] for j in range(iterations)]
+test_errors = [[0 for i in range(rounds)] for j in range(iterations)]
+
+for i in range(rounds):
+    [train_error, test_error] = run(points, rules, iterations)
+
+    for j in range(iterations):
+       train_errors[j][i] = train_error[j]
+       test_errors[j][i] = test_error[j]
+
+
+for i in range(iterations):
+    print("k = ", (i + 1)," train error: ", statistics.mean(train_errors[i]), "test error: ", statistics.mean(test_errors[i]))
