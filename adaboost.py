@@ -69,7 +69,7 @@ class Rule:
             return -1
 
 
-def read(file: str):
+def read_data(file: str):
     """
     This function receives a file, reads the data from the given file, shuffles the data and generates data points.
     :param file: given file to generate data points from.
@@ -83,7 +83,7 @@ def read(file: str):
     return points
 
 
-def createRules(points: list):
+def create_rules(points: list):
     """
     This function receives a list of data points and creates the rules.
     - Each rule is defined in the following way:
@@ -94,9 +94,9 @@ def createRules(points: list):
     """
     rules = []
     length = len(points)
-    for i in range(0, length):
+    for i in range(length):
         p1 = points[i]
-        for j in range(i + 1, length):
+        for j in range(i+1, length):
             p2 = points[j]
             is_axis_parallel = p1.x == p2.x
 
@@ -111,9 +111,9 @@ def createRules(points: list):
     return rules
 
 
-def split(points: list):
+def split_data(points: list):
     """
-    This function receives a list of data points, shuffles the data and splits it to 2 equal groups (train & test).
+    This function receives a list of data points and splits it to 2 equal groups (train & test).
     :param points: list of data points
     :return: train & test groups.
     """
@@ -163,16 +163,24 @@ def calculate_list_error(rules: list, l: list):
     return error_sum / len(l)
 
 
-def calculate_error(rules: list, train: list, test: list):
+def calculate_error(rules: list, train: list, test: list, iterations=8):
     """
     This function calculates the empirical error on the training and test sets.
     :param rules: list of important rules.
     :param train: list of data points (training set)
     :param test: list of data points (testing set)
+    :param iterations: number of iterations for computing the empirical errors
     :return: lists of empirical errors on the training and testing set over k iterations.
+
+    - NOTE: This function was CHANGED!
+
     """
-    print("train error: ", calculate_list_error(rules, train))
-    print("test error: ", calculate_list_error(rules, test))
+    train_errors, test_errors = ([] for _ in range(2))
+    iterations = len(rules) if iterations > len(rules) else iterations
+    for i in range(iterations):
+        train_errors.append(calculate_list_error(rules[:i + 1], train))
+        test_errors.append(calculate_list_error(rules[:i+1], test))
+    return train_errors, test_errors
 
 
 def run(points: list, rules: list, iterations: int):
@@ -184,7 +192,7 @@ def run(points: list, rules: list, iterations: int):
     """
     for pt in points:
         pt.w = 1 / len(points)  # Initialize point weights
-    train, test = split(points)
+    train, test = split_data(points)
 
     important_rules = []
     for i in range(iterations):
@@ -223,7 +231,7 @@ def run(points: list, rules: list, iterations: int):
     # TODO - Return the empirical error of the function H on the training set and on the test set.
 
 
-def generate(points: list):
+def generate_data_lists(points: list):
     """
     This function receives a list of data points and converts it to 4 different lists:
     - X and Y list of data points for each label.
@@ -241,13 +249,13 @@ def generate(points: list):
     return x1, y1, x2, y2
 
 
-def represent(points: list):
+def represent_data_points(points: list):
     """
     This function plots the data points.
     :param points: list of data points to plot.
     :return: None
     """
-    x1, y1, x2, y2 = generate(points)
+    x1, y1, x2, y2 = generate_data_lists(points)
     plt.scatter(x1, y1, color='red')
     plt.scatter(x2, y2, color='blue')
 
@@ -255,7 +263,7 @@ def represent(points: list):
     plt.show()
 
 
-points = read('rectangle.txt')
-rules = createRules(points)
+points = read_data('rectangle.txt')
+rules = create_rules(points)
 iterations = 8
 run(points, rules, iterations)
