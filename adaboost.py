@@ -164,7 +164,7 @@ def calculate_list_error(rules: list, l: list):
     return error_sum / len(l)
 
 
-def calculate_error(rules: list, train: list, test: list, iterations=8):
+def calculate_error(rules: list, train: list, test: list, iterations: int):
     """
     This function calculates the empirical error on the training and test sets.
     :param rules: list of important rules.
@@ -235,7 +235,7 @@ def run(points: list, rules: list, iterations: int):
 
         important_rules.append(classifier)
 
-    return calculate_error(rules=important_rules, train=train, test=test)
+    return calculate_error(rules=important_rules, train=train, test=test,iterations=iterations)
 
     # TODO - Return the empirical error of the function H on the training set and on the test set.
 
