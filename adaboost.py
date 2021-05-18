@@ -34,7 +34,7 @@ class Point:
 
 class Rule:
 
-    def __init__(self, p1: Point,p2: Point,):
+    def __init__(self, p1: Point,p2: Point):
         """
         - Rule: y=ax+b
         :param point: Single point for computing line equation.
@@ -46,7 +46,7 @@ class Rule:
         self.a = (self.p1.y - self.p2.y)
         self.b = (self.p2.x - self.p1.x)
         self.c = (self.p1.x * self.p2.y - self.p2.x * self.p1.y)
-        self.label = p1.label if p1.label == p2.label else 1
+        self.label = 1
 
     def eval(self, point: Point):
         """
