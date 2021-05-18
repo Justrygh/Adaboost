@@ -61,12 +61,12 @@ class Rule:
         """
 
         if self.is_axis_parallel:
-            return 1 if point.x - self.p.x > 0 else -1
+            return self.p.label if point.x - self.p.x >= 0 else - self.p.label
 
-        if self.a * point.x + self.b - point.y > 0:
-            return 1
+        if self.a * point.x + self.b - point.y >= 0:
+            return self.p.label
         else:
-            return -1
+            return -self.p.label
 
 
 def read_data(file: str):
