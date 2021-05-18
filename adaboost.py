@@ -44,7 +44,6 @@ class Rule:
         self.p = point
         self.a = coefficient
         self.b = bias
-        self.w = 0
         self.is_axis_parallel = is_axis_parallel
 
     def __eq__(self, other):
@@ -124,50 +123,50 @@ def split_data(points: list):
         return points[:int((len(points) + 1) / 2)], points[int((len(points) + 1) / 2):]
 
 
-def predict_value(rules: list, point: Point):
+def predict_value(rules_with_weights: list, point: Point):
     """
     This function predict the label of a point based on rules
-    :param rules: list of important rules.
+    :param rules_with_weights: list of important rules.
     :param point: to predict
     :return: 1 if predict 1 else -1
     """
     sum = 0
 
-    for h in rules:
-        sum += h.w * h.eval(point)
+    for h in rules_with_weights:
+        sum += h[1] * h[0].eval(point)
 
     return 1 if sum > 0 else -1
 
 
-def calculate_point_error(rules: list, point: Point):
+def calculate_point_error(rules_with_weights: list, point: Point):
     """
     This function calculates the empirical error on given point
-    :param rules: list of important rules.
+    :param rules_with_weights: list of important rules.
     :param point: to check for error
     :return: 1 if there is error else 0
     """
-    return 1 if predict_value(rules, point) != point.label else 0
+    return 1 if predict_value(rules_with_weights, point) != point.label else 0
 
 
-def calculate_list_error(rules: list, l: list):
+def calculate_list_error(rules_with_weights: list, l: list):
     """
       This function calculates the empirical error on given list
-      :param rules: list of important rules.
+      :param rules_with_weights: list of important rules.
       :param l: list of data points (training set)
       :return: total error
       """
     error_sum = 0
 
     for p in l:
-        error_sum += calculate_point_error(rules, p)
+        error_sum += calculate_point_error(rules_with_weights, p)
 
     return error_sum / len(l)
 
 
-def calculate_error(rules: list, train: list, test: list, iterations: int):
+def calculate_error(rules_with_weights: list, train: list, test: list, iterations: int):
     """
     This function calculates the empirical error on the training and test sets.
-    :param rules: list of important rules.
+    :param rules_with_weights: list of important rules.
     :param train: list of data points (training set)
     :param test: list of data points (testing set)
     :param iterations: number of iterations for computing the empirical errors
@@ -177,11 +176,11 @@ def calculate_error(rules: list, train: list, test: list, iterations: int):
 
     """
     train_errors, test_errors = ([] for _ in range(2))
-    iterations = len(rules) if iterations > len(rules) else iterations
+    iterations = len(rules_with_weights) if iterations > len(rules_with_weights) else iterations
 
     for i in range(iterations):
-        train_errors.append(calculate_list_error(rules[:i + 1], train))
-        test_errors.append(calculate_list_error(rules[:i + 1], test))
+        train_errors.append(calculate_list_error(rules_with_weights[:i + 1], train))
+        test_errors.append(calculate_list_error(rules_with_weights[:i + 1], test))
 
     return [train_errors, test_errors]
 
@@ -196,19 +195,18 @@ def run(points: list, rules: list, iterations: int):
     for pt in points:
         pt.w = 1 / len(points)  # Initialize point weights
 
-    for h in rules:
-        h.w = 0
 
     np.random.shuffle(points)
 
     train, test = split_data(points)
 
-    important_rules = []
+    rules_with_weights = []
     for i in range(iterations):
         min_error = np.inf  # Find the min error each iteration and the classifier.
         classifier = None
         for h in rules:
             error = 0
+
             for pt in train:
                 predict = h.eval(point=pt)
                 # TODO - Check prediction conditions: how to classify between 1 and -1
@@ -220,12 +218,12 @@ def run(points: list, rules: list, iterations: int):
                 min_error = error
                 classifier = h
 
-        classifier.w = math.log((1 - min_error) / min_error, math.e) / 2  # Update classifier weight based on error
+        classifier_weight = math.log((1 - min_error) / min_error, math.e) / 2  # Update classifier weight based on error
         normalization = 0
 
         for pt in train:
             """ Calculate the normalizing constant - save the calculation of new point weights in placeholder """
-            power = classifier.w * classifier.eval(point=pt) * pt.label * -1
+            power = classifier_weight * classifier.eval(point=pt) * pt.label * -1
             pt.placeholder = pt.w * (math.e ** power)
             normalization += pt.placeholder
 
@@ -233,9 +231,9 @@ def run(points: list, rules: list, iterations: int):
             weight = (1 / normalization) * pt.placeholder
             pt.w = weight
 
-        important_rules.append(classifier)
+        rules_with_weights.append((classifier, classifier_weight))
 
-    return calculate_error(rules=important_rules, train=train, test=test,iterations=iterations)
+    return calculate_error(rules_with_weights=rules_with_weights, train=train, test=test, iterations=iterations)
 
     # TODO - Return the empirical error of the function H on the training set and on the test set.
 
@@ -284,10 +282,11 @@ for i in range(rounds):
     [train_error, test_error] = run(points, rules, iterations)
 
     for j in range(iterations):
-       train_errors[j][i] = train_error[j]
-       test_errors[j][i] = test_error[j]
+        train_errors[j][i] = train_error[j]
+        test_errors[j][i] = test_error[j]
 
     print(i)
 
 for i in range(iterations):
-    print("k = ", (i + 1)," train error: ", "%.3f" % statistics.mean(train_errors[i]), "test error: ","%.3f" % statistics.mean(test_errors[i]))
+    print("k = ", (i + 1), " train error: ", "%.3f" % statistics.mean(train_errors[i]), "test error: ",
+          "%.3f" % statistics.mean(test_errors[i]))
