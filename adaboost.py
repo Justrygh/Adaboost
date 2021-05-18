@@ -34,7 +34,7 @@ class Point:
 
 class Rule:
 
-    def __init__(self, p1: Point,p2: Point, coefficient, is_axis_parallel, bias=0):
+    def __init__(self, p1: Point,p2: Point,):
         """
         - Rule: y=ax+b
         :param point: Single point for computing line equation.
@@ -43,15 +43,9 @@ class Rule:
         """
         self.p1 = p1
         self.p2 = p2
-        self.a = coefficient
-        self.b = bias
-        self.is_axis_parallel = is_axis_parallel
-
-    def __eq__(self, other):
-        return self.a == other.a and self.b == other.b
-
-    def __ne__(self, other):
-        return self.a != other.a and self.b != other.b
+        self.a = (self.p1.y - self.p2.y)
+        self.b = (self.p2.x - self.p1.x)
+        self.c = (self.p1.x * self.p2.y - self.p2.x * self.p1.y)
 
     def eval(self, point: Point):
         """
@@ -60,11 +54,7 @@ class Rule:
         - if eval > 0 return 1 otherwise -1
         :return: eval
         """
-
-        if self.is_axis_parallel:
-            return self.p1.label if point.x - self.p1.x >= 0 else - self.p1.label
-
-        if self.a * point.x + self.b - point.y >= 0:
+        if self.a * point.x + self.b *point.y + self.c >= 0:
             return self.p1.label
         else:
             return -self.p1.label
@@ -99,13 +89,7 @@ def create_rules(points: list):
         p1 = points[i]
         for j in range(i + 1, length):
             p2 = points[j]
-            is_axis_parallel = p1.x == p2.x
-
-            if not is_axis_parallel:
-                incline = (p1.y - p2.y) / (p1.x - p2.x)
-                bias = p1.y - incline * p1.x
-
-            rules.append(Rule(p1=p1,p2=p2,coefficient=incline, bias=bias, is_axis_parallel=is_axis_parallel))
+            rules.append(Rule(p1=p1,p2=p2))
             # else:
             # if p1.x equals p2.x -> incline = coefficient = infinity & bias = 0
             # rules.append(Rule(point=p1, coefficient=np.inf))
@@ -193,13 +177,12 @@ def run(points: list, rules: list, iterations: int):
     :param iterations: number of iterations to perform the algorithm.
     :return:
     """
-    for pt in points:
-        pt.w = 1 / len(points)  # Initialize point weights
-
-
     np.random.shuffle(points)
 
     train, test = split_data(points)
+
+    for pt in train:
+        pt.w = 1 / len(train)  # Initialize point weights
 
     rules_with_weights = []
     for i in range(iterations):
@@ -274,13 +257,14 @@ def represent_data_points(points: list,rules_with_weights: list):
         plt.plot([r.p1.x, r.p1.y],[r.p2.x, r.p2.y], marker='o')
 
     # TODO - Add classifier lines
+
     plt.show()
 
 
 points = read_data('rectangle.txt')
 rules = create_rules(points)
 iterations = 8
-rounds = 100
+rounds = 10
 
 train_errors = [[0 for i in range(rounds)] for j in range(iterations)]
 test_errors = [[0 for i in range(rounds)] for j in range(iterations)]
