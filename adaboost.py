@@ -14,7 +14,7 @@ class Point:
         """
         self.x = x
         self.y = y
-        self.label = label.astype(int)
+        self.label = label
         self.w = 0
         self.placeholder = None
 
@@ -46,6 +46,7 @@ class Rule:
         self.a = (self.p1.y - self.p2.y)
         self.b = (self.p2.x - self.p1.x)
         self.c = (self.p1.x * self.p2.y - self.p2.x * self.p1.y)
+        self.label = p1.label if p1.label == p2.label else 1
 
     def eval(self, point: Point):
         """
@@ -55,9 +56,9 @@ class Rule:
         :return: eval
         """
         if self.a * point.x + self.b *point.y + self.c >= 0:
-            return self.p1.label
+            return self.label
         else:
-            return -self.p1.label
+            return -self.label
 
 
 def read_data(file: str):
