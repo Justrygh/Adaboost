@@ -34,14 +34,15 @@ class Point:
 
 class Rule:
 
-    def __init__(self, point: Point, coefficient, is_axis_parallel, bias=0):
+    def __init__(self, p1: Point,p2: Point, coefficient, is_axis_parallel, bias=0):
         """
         - Rule: y=ax+b
         :param point: Single point for computing line equation.
         :param coefficient: a
         :param bias: b
         """
-        self.p = point
+        self.p1 = p1
+        self.p2 = p2
         self.a = coefficient
         self.b = bias
         self.is_axis_parallel = is_axis_parallel
@@ -61,12 +62,12 @@ class Rule:
         """
 
         if self.is_axis_parallel:
-            return self.p.label if point.x - self.p.x >= 0 else - self.p.label
+            return self.p1.label if point.x - self.p1.x >= 0 else - self.p1.label
 
         if self.a * point.x + self.b - point.y >= 0:
-            return self.p.label
+            return self.p1.label
         else:
-            return -self.p.label
+            return -self.p1.label
 
 
 def read_data(file: str):
@@ -104,7 +105,7 @@ def create_rules(points: list):
                 incline = (p1.y - p2.y) / (p1.x - p2.x)
                 bias = p1.y - incline * p1.x
 
-            rules.append(Rule(point=p1, coefficient=incline, bias=bias, is_axis_parallel=is_axis_parallel))
+            rules.append(Rule(p1=p1,p2=p2,coefficient=incline, bias=bias, is_axis_parallel=is_axis_parallel))
             # else:
             # if p1.x equals p2.x -> incline = coefficient = infinity & bias = 0
             # rules.append(Rule(point=p1, coefficient=np.inf))
@@ -232,6 +233,7 @@ def run(points: list, rules: list, iterations: int):
             pt.w = weight
 
         rules_with_weights.append((classifier, classifier_weight))
+        represent_data_points(train, rules_with_weights)
 
     return calculate_error(rules_with_weights=rules_with_weights, train=train, test=test, iterations=iterations)
 
@@ -247,7 +249,7 @@ def generate_data_lists(points: list):
     """
     x1, y1, x2, y2 = ([] for _ in range(4))
     for pt in points:
-        if pt.getLabel() == 1:
+        if pt.label == 1:
             x1.append(pt.x)
             y1.append(pt.y)
         else:
@@ -256,7 +258,7 @@ def generate_data_lists(points: list):
     return x1, y1, x2, y2
 
 
-def represent_data_points(points: list):
+def represent_data_points(points: list,rules_with_weights: list):
     """
     This function plots the data points.
     :param points: list of data points to plot.
@@ -265,6 +267,11 @@ def represent_data_points(points: list):
     x1, y1, x2, y2 = generate_data_lists(points)
     plt.scatter(x1, y1, color='red')
     plt.scatter(x2, y2, color='blue')
+
+
+    for rule in rules_with_weights:
+        r = rule[0]
+        plt.plot([r.p1.x, r.p1.y],[r.p2.x, r.p2.y], marker='o')
 
     # TODO - Add classifier lines
     plt.show()
