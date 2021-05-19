@@ -18,7 +18,6 @@ class Point:
         self.y = y
         self.label = label
         self.w = 0
-        self.placeholder = None
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
