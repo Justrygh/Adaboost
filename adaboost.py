@@ -143,12 +143,24 @@ def calculate_list_error(rules_with_weights: list, l: list):
       :param l: list of data points (training set)
       :return: total error
       """
-    error_sum = 0
+    total_error_sum = 0
+    positive_error_sum = 0
+    positive_count = 0
+    negative_error_sum = 0
+    negative_count = 0
 
     for p in l:
-        error_sum += calculate_point_error(rules_with_weights, p)
+        error = calculate_point_error(rules_with_weights, p)
+        total_error_sum += error
 
-    return error_sum / len(l)
+        if p.label > 0:
+            positive_error_sum += error
+            positive_count += 1
+        else:
+            negative_error_sum += error
+            negative_count += 1
+
+    return [total_error_sum / len(l), positive_error_sum / positive_count, negative_error_sum / negative_count]
 
 
 def calculate_error(rules_with_weights: list, train: list, test: list, iterations: int):
@@ -226,7 +238,7 @@ def run(points: list, rules: list, iterations: int):
     # TODO - Return the empirical error of the function H on the training set and on the test set.
 
 
-def generate_data_lists(points: list,rules_with_weights: list):
+def generate_data_lists(points: list, rules_with_weights: list):
     """
     This function receives a list of data points and converts it to 4 different lists:
     - X and Y list of data points for each label.
@@ -235,7 +247,7 @@ def generate_data_lists(points: list,rules_with_weights: list):
     """
     x1, y1, x2, y2 = ([] for _ in range(4))
     for pt in points:
-        if pt.label == predict_value(rules_with_weights,pt):
+        if pt.label != predict_value(rules_with_weights, pt):
             x1.append(pt.x)
             y1.append(pt.y)
         else:
@@ -250,7 +262,7 @@ def represent_data_points(points: list, rules_with_weights: list):
     :param points: list of data points to plot.
     :return: None
     """
-    x1, y1, x2, y2 = generate_data_lists(points,rules_with_weights)
+    x1, y1, x2, y2 = generate_data_lists(points, rules_with_weights)
     plt.scatter(x1, y1, color='red')
     plt.scatter(x2, y2, color='blue')
 
@@ -266,20 +278,36 @@ def represent_data_points(points: list, rules_with_weights: list):
 points = read_data('rectangle.txt')
 rules = create_rules(points)
 iterations = 8
-rounds = 50
+rounds = 1
 
 train_errors = [[0 for i in range(rounds)] for j in range(iterations)]
+train_errors_pos = [[0 for i in range(rounds)] for j in range(iterations)]
+train_errors_neg = [[0 for i in range(rounds)] for j in range(iterations)]
+
 test_errors = [[0 for i in range(rounds)] for j in range(iterations)]
+test_errors_pos = [[0 for i in range(rounds)] for j in range(iterations)]
+test_errors_neg = [[0 for i in range(rounds)] for j in range(iterations)]
 
 for i in range(rounds):
     [train_error, test_error] = run(points, rules, iterations)
 
     for j in range(iterations):
-        train_errors[j][i] = train_error[j]
-        test_errors[j][i] = test_error[j]
+        train_errors[j][i] = train_error[j][0]
+        train_errors_pos[j][i] = train_error[j][1]
+        train_errors_neg[j][i] = train_error[j][2]
+
+        test_errors[j][i] = test_error[j][0]
+        test_errors_pos[j][i] = test_error[j][1]
+        test_errors_neg[j][i] = test_error[j][2]
 
     print(i)
 
+print("error")
 for i in range(iterations):
-    print("k = ", (i + 1), " train error: ", "%.3f" % statistics.mean(train_errors[i]), "test error: ",
-          "%.3f" % statistics.mean(test_errors[i]))
+    print("k = ", (i + 1),
+          "train:[all:", "%.3f" % statistics.mean(train_errors[i]),
+          ",pos:", "%.3f" % statistics.mean(train_errors_pos[i]),
+          ",neg:", "%.3f" % statistics.mean(train_errors_neg[i]),
+          "] test: [all:", "%.3f" % statistics.mean(test_errors[i]),
+          ",pos:", "%.3f" % statistics.mean(test_errors_pos[i]),
+          ",neg:", "%.3f" % statistics.mean(test_errors_neg[i]),"]")

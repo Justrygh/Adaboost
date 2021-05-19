@@ -1,0 +1,25 @@
+Results after 100 rounds:
+k =  1  train error:  0.255 test error:  0.293
+k =  2  train error:  0.297 test error:  0.398
+k =  3  train error:  0.148 test error:  0.275
+k =  4  train error:  0.196 test error:  0.290
+k =  5  train error:  0.060 test error:  0.201
+k =  6  train error:  0.076 test error:  0.224
+k =  7  train error:  0.053 test error:  0.179
+k =  8  train error:  0.044 test error:  0.191
+
+1. Analyze the behavior of Adaboost on train and test. Do you see any exceptional behavior?
+Explain.
+Answer:
+At the beginning i thought that because it rectangle the algorithm will pick the rectangles lines.
+i find out that i was wrong.
+How ever it look like after 5 rules the error reduced significant
+probably the first rule was "overfit" to pick the fit all the positive points because there are much more positive points then negative
+And using the rest to Shattering the rectangular area of the negative points.
+How ever do to the fact that we sample only part of the data on train the rectangular is not exactly "rectangular"
+therefore after 5 rules the train error reduced significant because it is probably start to shattering a shape that fit to the train
+
+2. Do you see overfitting? Explain
+After round 4 there is overfitting the train error reduced significanty while the test error reduced a bit.
+It is probably becouse after 4 rules the adabost start to pick rules that fit to the shape of the negative points area,
+so the area created by
