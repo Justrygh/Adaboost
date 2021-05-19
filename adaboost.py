@@ -34,7 +34,7 @@ class Point:
 
 class Rule:
 
-    def __init__(self, p1: Point,p2: Point):
+    def __init__(self, p1: Point,p2: Point,label: int):
         """
         - Rule: y=ax+b
         :param point: Single point for computing line equation.
@@ -46,7 +46,7 @@ class Rule:
         self.a = (self.p1.y - self.p2.y)
         self.b = (self.p2.x - self.p1.x)
         self.c = (self.p1.x * self.p2.y - self.p2.x * self.p1.y)
-        self.label = 1
+        self.label = label
 
     def eval(self, point: Point):
         """
@@ -90,7 +90,8 @@ def create_rules(points: list):
         p1 = points[i]
         for j in range(i + 1, length):
             p2 = points[j]
-            rules.append(Rule(p1=p1,p2=p2))
+            rules.append(Rule(p1=p1,p2=p2,label=1))
+            rules.append(Rule(p1=p1, p2=p2, label=-1))
             # else:
             # if p1.x equals p2.x -> incline = coefficient = infinity & bias = 0
             # rules.append(Rule(point=p1, coefficient=np.inf))
@@ -188,27 +189,25 @@ def run(points: list, rules: list, iterations: int):
     rules_with_weights = []
     for i in range(iterations):
         min_error = np.inf  # Find the min error each iteration and the classifier.
-        classifier = None
+        min_classifier = None
+
         for h in rules:
             error = 0
 
             for pt in train:
-                predict = h.eval(point=pt)
-                # TODO - Check prediction conditions: how to classify between 1 and -1
-                predict = -1 if predict < 0 else 1
-                if predict != pt.label:
+                if h.eval(point=pt) != pt.label:
                     error += pt.w
 
-            if error < min_error:  # Find min. error classifier
+            if min_classifier is None or error < min_error:  # Find min. error classifier
                 min_error = error
-                classifier = h
+                min_classifier = h
 
         classifier_weight = math.log((1 - min_error) / min_error, math.e) / 2  # Update classifier weight based on error
         normalization = 0
 
         for pt in train:
             """ Calculate the normalizing constant - save the calculation of new point weights in placeholder """
-            power = classifier_weight * classifier.eval(point=pt) * pt.label * -1
+            power = classifier_weight * min_classifier.eval(point=pt) * pt.label * -1
             pt.placeholder = pt.w * (math.e ** power)
             normalization += pt.placeholder
 
@@ -216,7 +215,7 @@ def run(points: list, rules: list, iterations: int):
             weight = (1 / normalization) * pt.placeholder
             pt.w = weight
 
-        rules_with_weights.append((classifier, classifier_weight))
+        rules_with_weights.append((min_classifier, classifier_weight))
         represent_data_points(train, rules_with_weights)
 
     return calculate_error(rules_with_weights=rules_with_weights, train=train, test=test, iterations=iterations)
