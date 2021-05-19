@@ -16,17 +16,17 @@ k =  8 train:[all: 0.046 ,pos: 0.101 ,neg: 0.027 ] test: [all: 0.195 ,pos: 0.326
 1. Analyze the behavior of Adaboost on train and test. Do you see any exceptional behavior?
 Explain.
 Answer:
-At the beginning i thought that because it rectangle the algorithm will pick the rectangles lines (4 lines).
-i find out that i was wrong.
-It look like after 5 rules the train error reduced significant
-The first rule was "overfit" to pick the fit all the negative points because there are much more negative points then positive
+At the beginning, we thought that because the positive points are blocked by rectangle the algorithm will pick the rectangles lines (4 lines).
+After analysing the results we found out that we were wrong.
+It looks like after 5 rules the train error reduced significantly.
+The first rule was "overfit". The rule tried to fit all the negative points because there are much more negative points then positive
 The adaboost using the rest of the rules to Shatter the rectangular area of the positive points.
-How ever do to the fact that we sample only part of the data on train the rectangular is not exactly "rectangular"
-therefore after 5 rules the train error reduced significant because it is probably start to shattering a shape that fit to the train,
-how ever it reduced even the error of the test but less.
+However, due to the fact that we sample only part of the data on train the rectangular is not exactly "rectangular"
+therefore after 5 rules the train error reduced significantly because it is probably start to shattering a shape that fit to the train,
+hence, it reduced even the error of the test but much lesser.
 
 2. Do you see overfitting? Explain
 Answer:
 After round 4 there is overfitting the train error reduced significantly while the test error reduced a bit.
-It is probably because after 4 rules the adabost start to pick rules that very fit to the shape of the train positive points area,
-and the this area is not exactly the area of the all the positive points do to the fact that we sample them randomly
+It is probably because after 4 rules the adabost starts to pick up rules that fits to the shape of the train positive points area,
+and the given area is not exactly the area of the all the positive points do to the fact that we sample them randomly.
