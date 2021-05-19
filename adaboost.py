@@ -1,3 +1,5 @@
+import random
+
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -34,7 +36,7 @@ class Point:
 
 class Rule:
 
-    def __init__(self, p1: Point,p2: Point,label: int):
+    def __init__(self, p1: Point, p2: Point, label: int):
         """
         - Rule: y=ax+b
         :param point: Single point for computing line equation.
@@ -55,7 +57,7 @@ class Rule:
         - if eval > 0 return 1 otherwise -1
         :return: eval
         """
-        if self.a * point.x + self.b *point.y + self.c >= 0:
+        if self.a * point.x + self.b * point.y + self.c >= 0:
             return self.label
         else:
             return -self.label
@@ -90,7 +92,7 @@ def create_rules(points: list):
         p1 = points[i]
         for j in range(i + 1, length):
             p2 = points[j]
-            rules.append(Rule(p1=p1,p2=p2,label=1))
+            rules.append(Rule(p1=p1, p2=p2, label=1))
             rules.append(Rule(p1=p1, p2=p2, label=-1))
             # else:
             # if p1.x equals p2.x -> incline = coefficient = infinity & bias = 0
@@ -189,7 +191,7 @@ def run(points: list, rules: list, iterations: int):
     rules_with_weights = []
     for i in range(iterations):
         min_error = np.inf  # Find the min error each iteration and the classifier.
-        min_classifier = None
+        min_classifiers = []
 
         for h in rules:
             error = 0
@@ -198,22 +200,24 @@ def run(points: list, rules: list, iterations: int):
                 if h.eval(point=pt) != pt.label:
                     error += pt.w
 
-            if min_classifier is None or error < min_error:  # Find min. error classifier
-                min_error = error
-                min_classifier = h
+            if len(min_classifiers) == 0 or error <= min_error:  # Find min. error classifier
+                if error != min_error:
+                    min_error = error
+                    min_classifiers.clear()
+
+                min_classifiers.append(h)
 
         classifier_weight = math.log((1 - min_error) / min_error, math.e) / 2  # Update classifier weight based on error
         normalization = 0
+        min_classifier = random.choice(min_classifiers)
 
         for pt in train:
             """ Calculate the normalizing constant - save the calculation of new point weights in placeholder """
-            power = classifier_weight * min_classifier.eval(point=pt) * pt.label * -1
-            pt.placeholder = pt.w * (math.e ** power)
-            normalization += pt.placeholder
+            pt.w = pt.w / (math.e ** (classifier_weight * min_classifier.eval(point=pt) * pt.label))
+            normalization += pt.w
 
         for pt in train:
-            weight = (1 / normalization) * pt.placeholder
-            pt.w = weight
+            pt.w = (1 / normalization) * pt.w
 
         rules_with_weights.append((min_classifier, classifier_weight))
         represent_data_points(train, rules_with_weights)
@@ -223,7 +227,7 @@ def run(points: list, rules: list, iterations: int):
     # TODO - Return the empirical error of the function H on the training set and on the test set.
 
 
-def generate_data_lists(points: list):
+def generate_data_lists(points: list,rules_with_weights: list):
     """
     This function receives a list of data points and converts it to 4 different lists:
     - X and Y list of data points for each label.
@@ -232,7 +236,7 @@ def generate_data_lists(points: list):
     """
     x1, y1, x2, y2 = ([] for _ in range(4))
     for pt in points:
-        if pt.label == 1:
+        if pt.label == predict_value(rules_with_weights,pt):
             x1.append(pt.x)
             y1.append(pt.y)
         else:
@@ -241,20 +245,19 @@ def generate_data_lists(points: list):
     return x1, y1, x2, y2
 
 
-def represent_data_points(points: list,rules_with_weights: list):
+def represent_data_points(points: list, rules_with_weights: list):
     """
     This function plots the data points.
     :param points: list of data points to plot.
     :return: None
     """
-    x1, y1, x2, y2 = generate_data_lists(points)
+    x1, y1, x2, y2 = generate_data_lists(points,rules_with_weights)
     plt.scatter(x1, y1, color='red')
     plt.scatter(x2, y2, color='blue')
 
-
     for rule in rules_with_weights:
         r = rule[0]
-        plt.plot([r.p1.x, r.p1.y],[r.p2.x, r.p2.y], marker='o')
+        plt.plot([r.p1.x, r.p1.y], [r.p2.x, r.p2.y], marker='o')
 
     # TODO - Add classifier lines
 
