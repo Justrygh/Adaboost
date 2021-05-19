@@ -1,25 +1,32 @@
-Results after 100 rounds:
-k =  1  train error:  0.255 test error:  0.293
-k =  2  train error:  0.297 test error:  0.398
-k =  3  train error:  0.148 test error:  0.275
-k =  4  train error:  0.196 test error:  0.290
-k =  5  train error:  0.060 test error:  0.201
-k =  6  train error:  0.076 test error:  0.224
-k =  7  train error:  0.053 test error:  0.179
-k =  8  train error:  0.044 test error:  0.191
+authors:
+Ido Kahana 316606680 (Testing, improvement, implementation, visualization)
+Ilya Khakhiashvili 317310779 (validation, improvement, implementation)
+We worked together on the algorithm
+
+results after 100 rounds:
+k =  1 train:[all: 0.255 ,pos: 0.910 ,neg: 0.033 ] test: [all: 0.299 ,pos: 0.936 ,neg: 0.082 ]
+k =  2 train:[all: 0.297 ,pos: 0.330 ,neg: 0.302 ] test: [all: 0.405 ,pos: 0.417 ,neg: 0.387 ]
+k =  3 train:[all: 0.151 ,pos: 0.346 ,neg: 0.084 ] test: [all: 0.279 ,pos: 0.491 ,neg: 0.208 ]
+k =  4 train:[all: 0.177 ,pos: 0.445 ,neg: 0.094 ] test: [all: 0.295 ,pos: 0.552 ,neg: 0.201 ]
+k =  5 train:[all: 0.060 ,pos: 0.155 ,neg: 0.026 ] test: [all: 0.203 ,pos: 0.376 ,neg: 0.146 ]
+k =  6 train:[all: 0.080 ,pos: 0.157 ,neg: 0.058 ] test: [all: 0.229 ,pos: 0.373 ,neg: 0.177 ]
+k =  7 train:[all: 0.053 ,pos: 0.157 ,neg: 0.017 ] test: [all: 0.186 ,pos: 0.404 ,neg: 0.113 ]
+k =  8 train:[all: 0.046 ,pos: 0.101 ,neg: 0.027 ] test: [all: 0.195 ,pos: 0.326 ,neg: 0.149 ]
 
 1. Analyze the behavior of Adaboost on train and test. Do you see any exceptional behavior?
 Explain.
 Answer:
-At the beginning i thought that because it rectangle the algorithm will pick the rectangles lines.
+At the beginning i thought that because it rectangle the algorithm will pick the rectangles lines (4 lines).
 i find out that i was wrong.
-How ever it look like after 5 rules the error reduced significant
-probably the first rule was "overfit" to pick the fit all the positive points because there are much more positive points then negative
-And using the rest to Shattering the rectangular area of the negative points.
+It look like after 5 rules the train error reduced significant
+The first rule was "overfit" to pick the fit all the negative points because there are much more negative points then positive
+The adaboost using the rest of the rules to Shatter the rectangular area of the positive points.
 How ever do to the fact that we sample only part of the data on train the rectangular is not exactly "rectangular"
-therefore after 5 rules the train error reduced significant because it is probably start to shattering a shape that fit to the train
+therefore after 5 rules the train error reduced significant because it is probably start to shattering a shape that fit to the train,
+how ever it reduced even the error of the test but less.
 
 2. Do you see overfitting? Explain
-After round 4 there is overfitting the train error reduced significanty while the test error reduced a bit.
-It is probably becouse after 4 rules the adabost start to pick rules that fit to the shape of the negative points area,
-so the area created by
+Answer:
+After round 4 there is overfitting the train error reduced significantly while the test error reduced a bit.
+It is probably because after 4 rules the adabost start to pick rules that very fit to the shape of the train positive points area,
+and the this area is not exactly the area of the all the positive points do to the fact that we sample them randomly

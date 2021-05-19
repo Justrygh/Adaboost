@@ -231,7 +231,7 @@ def run(points: list, rules: list, iterations: int):
             pt.w = pt.w / normalization
 
         rules_with_weights.append((min_classifier, classifier_weight))
-        represent_data_points(train, rules_with_weights)
+        #represent_data_points(train, rules_with_weights)
 
     return calculate_error(rules_with_weights=rules_with_weights, train=train, test=test, iterations=iterations)
 
@@ -278,7 +278,7 @@ def represent_data_points(points: list, rules_with_weights: list):
 points = read_data('rectangle.txt')
 rules = create_rules(points)
 iterations = 8
-rounds = 1
+rounds = 100
 
 train_errors = [[0 for i in range(rounds)] for j in range(iterations)]
 train_errors_pos = [[0 for i in range(rounds)] for j in range(iterations)]
