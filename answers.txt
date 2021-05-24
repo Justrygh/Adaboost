@@ -39,7 +39,7 @@ it look like there is some over-fitting for the negative points and the algorith
 since with one line there is not much we can do because the positive points are ordered in rectangle area, and there are much more negative points then positive points,
 so it will make sense to pick some line that simply mark most of the points regard to where there are as negative.
 
-At round k = 2 again there is some over-fitting for the train positive points,
+At round k = 2 again there is some over-fitting for the positive points,
 the train positive points error was reduced significantly(~74%) while the test positive points error was reduced only(~46%),
 and the negative points error was dramatically Surprisingly increased by almost (~400-700%)
 one explanation to that is the fact that adaboost try to narrow down something like a ray,
@@ -48,13 +48,12 @@ one explanation to that is the fact that adaboost try to narrow down something l
 was sample at random so the area is Similar but not exactly the same, the "ray" area is fitting to the train positive points area and therefore have
 much higher error for the test data.
 
-
 At round k = 3 again there is some over-fitting for the train negative points,
 the train negative points error was reduced significantly(~73%) while the test negative points error was reduced only(~55%),
-and the positive points error was slightly Surprisingly increased
+and the positive points error was slightly Surprisingly increased for the test(~5%) but Significantly increase for the train(16%),
 one explanation to that is the fact that adaboost try to build something like a triangle, but because he can only see the test points and the test positive points
 was sample at random so the area is Similar but not exactly the same, the "triangle" are is fitting to the train positive points area and therefore have
-much higher error for the test data.
+much higher error for the test negative points.
 
 At round 5 there is over-fitting the train error reduced significantly(~66%) while the test error reduced much less(~32%).
 It is probably because with 5 rules the adabost starts to pick up rules that fits to the shape of the train positive points area(rectangle),
