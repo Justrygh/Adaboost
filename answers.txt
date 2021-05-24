@@ -18,15 +18,46 @@ Explain.
 Answer:
 At the beginning, we thought that because the positive points are blocked by rectangle the algorithm will pick the rectangles lines (4 lines).
 After analysing the results we found out that we were wrong.
-It looks like after 5 rules the train error reduced significantly.
-The first rule was "overfit". The rule tried to fit all the negative points because there are much more negative points then positive
-The adaboost using the rest of the rules to Shatter the rectangular area of the positive points.
-However, due to the fact that we sample only part of the data on train the rectangular is not exactly "rectangular"
-therefore after 5 rules the train error reduced significantly because it is probably start to shattering a shape that fit to the train,
-hence, it reduced even the error of the test but much lesser.
+It looks like with k = 5 rules the train error reduced significantly.
+it is probably because as human we think about the effective solution which is rectangle,
+however the algorithm is "greedy" he just doesn't know that he is going to have more then 4 lines, so along the way he pick lines that are effective for given k must effective in the long run.
+which are not necessary the lines that build a rectangle.
 
-2. Do you see overfitting? Explain
+The best example is the case when k = 1, because of the the fact that there are much more negative points then positive and the positive are ordered
+in rectangular like area the best line for this situation is a line that simply decide that each point is negative Regardless of its labeling
+and indeed the algorithm pick when k = 1 such a line, a line that have error for the negative "0.033" train and "0.082" for the test
+while the positive points error was very high "0.910" for the train and "0.936" for the test.
+
+Probably the reason why at round 5 the error reduced significantly is the fact that the algorithm have enough leeway so this 5 rules can almost act like a rectangle in some way,
+how ever do to the fact that the train data that was sampled randomly is not exactly the test data and the shape of the positive points that build the rectangle like area are probably Similar but are not the same, this is
+probably the reason why with 5 rules the train error reduced significantly(~66%) while the test error reduced only (~32%)
+
+2. Do you see over-fitting? Explain
 Answer:
-After round 4 there is overfitting the train error reduced significantly while the test error reduced a bit.
-It is probably because after 4 rules the adabost starts to pick up rules that fits to the shape of the train positive points area,
-and the given area is not exactly the area of the all the positive points do to the fact that we sample them randomly.
+At round  k = 1 the algorithm pick a line that shattering almost for the train(,pos: 0.910 ,neg: 0.033) and for the test (pos: 0.936 ,neg: 0.082) from this data
+it look like there is some over-fitting for the negative points and the algorithm rule is shattering almost only negative points, which is also make sense
+since with one line there is not much we can do because the positive points are ordered in rectangle area, and there are much more negative points then positive points,
+so it will make sense to pick some line that simply mark most of the points regard to where there are as negative.
+
+At round k = 2 again there is some over-fitting for the train positive points,
+the train positive points error was reduced significantly(~74%) while the test positive points error was reduced only(~46%),
+and the negative points error was dramatically Surprisingly increased by almost (~400-700%)
+one explanation to that is the fact that adaboost try to narrow down something like a ray,
+ and this ray can shatter many points but absolutely will miss many negative&positive points and indeed this what happened,
+ because he can only see the test points and the test positive points
+was sample at random so the area is Similar but not exactly the same, the "ray" area is fitting to the train positive points area and therefore have
+much higher error for the test data.
+
+
+At round k = 3 again there is some over-fitting for the train negative points,
+the train negative points error was reduced significantly(~73%) while the test negative points error was reduced only(~55%),
+and the positive points error was slightly Surprisingly increased
+one explanation to that is the fact that adaboost try to build something like a triangle, but because he can only see the test points and the test positive points
+was sample at random so the area is Similar but not exactly the same, the "triangle" are is fitting to the train positive points area and therefore have
+much higher error for the test data.
+
+At round 5 there is over-fitting the train error reduced significantly(~66%) while the test error reduced much less(~32%).
+It is probably because with 5 rules the adabost starts to pick up rules that fits to the shape of the train positive points area(rectangle),
+and the given area is Similar but not exactly the area of all the positive points do to the fact that for the train we sample them randomly.
+
+
